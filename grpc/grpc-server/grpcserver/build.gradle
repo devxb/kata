@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version '0.8.19'
+}
+
+group 'xb.note'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    runtimeOnly 'io.grpc:grpc-netty-shaded:1.49.0'
+    implementation 'io.grpc:grpc-protobuf:1.49.0'
+    implementation 'io.grpc:grpc-stub:1.49.0'
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
+    implementation 'com.google.protobuf:protobuf-java-util:3.21.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir 'build/generated/source/proto/main/grpc/xb/note/grpc'
+            srcDir 'build/generated/source/proto/main/java/xb/note/grpc'
+            // 여기에 새로운 proto파일이 위치한 경로를 추가할 수 있음.
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.5"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.49.0'
+        }
+    }
+    // 생성된 파일이 위치할 경로를 지정해준다. 지정하지않으면, project root의 build디렉토리 하단에 위치하게됨.
+//    generatedFilesBaseDir = "$projectDir/src/grpc"
+    generateProtoTasks {
+        all()*.plugins{
+            grpc{}
+        }
+        ofSourceSet('main')
+    }
+}

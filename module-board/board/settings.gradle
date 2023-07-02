@@ -1,0 +1,10 @@
+rootProject.name = 'board'
+include 'application'
+include 'usermanager'
+include 'repository'
+include 'domain'
+include 'boardmanager'
+include 'acceptance'
+include 'acceptance:accept'
+findProject(':acceptance:accept')?.name = 'accept'
+

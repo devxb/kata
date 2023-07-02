@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id "org.sonarqube" version "3.5.0.2730"
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "devxb_javaNote_AYfdR2b5i7-U0-vSiHhS"
+    }
+}
+
+allprojects {
+    group = 'org.example'
+    version = '0.0.1-SNAPSHOT'
+
+    targetCompatibility = '11'
+    sourceCompatibility = '11'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+
+    repositories {
+        mavenCentral()
+    }
+
+    jacoco {
+        toolVersion = '0.8.9'
+    }
+
+    test {
+        useJUnitPlatform()
+        finalizedBy 'jacocoTestReport'
+    }
+
+    jacocoTestReport {
+        reports {
+            html.required = true
+            csv.required = true
+            xml.required = true
+        }
+        finalizedBy 'jacocoTestCoverageVerification'
+    }
+}

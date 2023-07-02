@@ -1,0 +1,13 @@
+rootProject.name = 'pet'
+include 'user'
+include 'user:domain'
+findProject(':user:domain')?.name = 'domain'
+include 'core'
+include 'core:meta'
+findProject(':core:meta')?.name = 'meta'
+include 'user:repository'
+findProject(':user:repository')?.name = 'repository'
+include 'data'
+include 'user:controller'
+findProject(':user:controller')?.name = 'controller'
+

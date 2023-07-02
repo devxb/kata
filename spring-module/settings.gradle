@@ -1,0 +1,5 @@
+rootProject.name = 'springmodule'
+
+include 'application'
+include 'library'
+
