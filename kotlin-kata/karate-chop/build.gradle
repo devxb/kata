@@ -1,0 +1,33 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.10'
+    id 'application'
+}
+
+group = 'org.example.kotlin.kata'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'io.kotest:kotest-runner-junit5:5.7.2'
+    testImplementation 'io.kotest:kotest-assertions-core:5.7.2'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '17'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '17'
+}
+
+application {
+    mainClassName = 'MainKt'
+}
