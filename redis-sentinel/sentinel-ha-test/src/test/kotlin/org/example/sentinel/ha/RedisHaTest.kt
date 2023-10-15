@@ -1,6 +1,7 @@
 package org.example.sentinel.ha
 
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.test.context.ContextConfiguration
 
@@ -8,18 +9,26 @@ import org.springframework.test.context.ContextConfiguration
 internal class RedisHaTest(private val redisTemplate: RedisTemplate<String, Int>) :
     DescribeSpec({
 
-        describe("Sentinel failover시 데이터 유실 테스트") {
+        describe("RedisTemplate Set 로직은") {
 
-            context("데이터를 보내는중에 failover가 발생하면,") {
+            context("1000개의 데이터을 입력중에 failover가 발생하면") {
+                val repeatCount = 1_000;
+                val sleepTime = 100L;
 
-                it("데이터는 손실될것이다.") {
-                    val repeatCount = 1_000;
-
+                it("데이터가 손실되지 않을것이다.") {
                     repeat(repeatCount) {
-                        println("input ${it} -> ${it}")
-                        redisTemplate.opsForValue()[it.toString()] = it
-                        Thread.sleep(100)
+                        println("input test:${it} -> ${it}")
+                        try {
+                            redisTemplate.opsForValue()["test:${it}"] = it
+                            Thread.sleep(sleepTime)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
+
+                    val allSavedKeys =
+                        redisTemplate.execute { it.keyCommands().keys("*".toByteArray()) }
+                    allSavedKeys!!.size shouldBe repeatCount
                 }
             }
         }
