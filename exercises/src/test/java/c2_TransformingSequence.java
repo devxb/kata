@@ -1,40 +1,39 @@
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /**
  * It's time to do some data manipulation!
- *
+ * <p>
  * Read first:
- *
- * https://projectreactor.io/docs/core/release/reference/#which.values
- *
+ * <p>
+ * <a href="https://projectreactor.io/docs/core/release/reference/#which.values">...</a>
+ * <p>
  * Useful documentation:
- *
- * https://projectreactor.io/docs/core/release/reference/#which-operator
- * https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html
- * https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html
+ * <p>
+ * <a href="https://projectreactor.io/docs/core/release/reference/#which-operator">...</a>
+ * <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html">...</a>
+ * <a href="https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html">...</a>
  *
  * @author Stefan Dragisic
  */
-public class c2_TransformingSequence extends TransformingSequenceBase {
+class c2_TransformingSequence extends TransformingSequenceBase {
 
     /***
      * Your task is simple:
      *  Increment each number emitted by the numerical service
      */
     @Test
-    public void transforming_sequence() {
+    void transforming_sequence() {
         Flux<Integer> numbersFlux = numerical_service()
-                //todo change only this line
-                ;
+            .map(number -> number + 1);
 
         //StepVerifier is used for testing purposes
         //ignore it for now, or explore it independently
         StepVerifier.create(numbersFlux)
-                    .expectNext(2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
-                    .verifyComplete();
+            .expectNext(2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+            .verifyComplete();
     }
 
     /***
@@ -44,48 +43,51 @@ public class c2_TransformingSequence extends TransformingSequenceBase {
      *   - "<": if given number is lesser then 0
      */
     @Test
-    public void transforming_sequence_2() {
+    void transforming_sequence_2() {
         Flux<Integer> numbersFlux = numerical_service_2();
 
-        //todo: do your changes here
-        Flux<String> resultSequence = null;
+        Flux<String> resultSequence = numbersFlux.map(number -> {
+            if (number > 0) {
+                return ">";
+            }
+            if (number == 0) {
+                return "=";
+            }
+            return "<";
+        });
 
         //don't change code below
         StepVerifier.create(resultSequence)
-                    .expectNext(">", "<", "=", ">", ">")
-                    .verifyComplete();
+            .expectNext(">", "<", "=", ">", ">")
+            .verifyComplete();
     }
 
     /**
-     * `object_service()` streams sequence of Objects, but if you peek into service implementation, you can see
-     * that these items are in fact strings!
-     * Casting using `map()` to cast is one way to do it, but there is more convenient way.
-     * Remove `map` operator and use more appropriate operator to cast sequence to String.
+     * `object_service()` streams sequence of Objects, but if you peek into service implementation, you can see that
+     * these items are in fact strings! Casting using `map()` to cast is one way to do it, but there is more convenient
+     * way. Remove `map` operator and use more appropriate operator to cast sequence to String.
      */
     @Test
-    public void cast() {
+    void cast() {
         Flux<String> numbersFlux = object_service()
-                .map(i -> (String) i); //todo: change this line only
-
+            .cast(String.class);
 
         StepVerifier.create(numbersFlux)
-                    .expectNext("1", "2", "3", "4", "5")
-                    .verifyComplete();
+            .expectNext("1", "2", "3", "4", "5")
+            .verifyComplete();
     }
 
     /**
-     * `maybe_service()` may return some result.
-     * In case it doesn't return any result, return value "no results".
+     * `maybe_service()` may return some result. In case it doesn't return any result, return value "no results".
      */
     @Test
-    public void maybe() {
+    void maybe() {
         Mono<String> result = maybe_service()
-                //todo: change this line only
-                ;
+            .defaultIfEmpty("no results");
 
         StepVerifier.create(result)
-                    .expectNext("no results")
-                    .verifyComplete();
+            .expectNext("no results")
+            .verifyComplete();
     }
 
     /**
@@ -93,15 +95,13 @@ public class c2_TransformingSequence extends TransformingSequenceBase {
      * this service.
      */
     @Test
-    public void sequence_sum() {
-        //todo: change code as you need
-        Mono<Integer> sum = null;
-        numerical_service();
+    void sequence_sum() {
+        Mono<Integer> sum = numerical_service().reduce(Integer::sum);
 
         //don't change code below
         StepVerifier.create(sum)
-                    .expectNext(55)
-                    .verifyComplete();
+            .expectNext(55)
+            .verifyComplete();
     }
 
     /***
@@ -109,31 +109,28 @@ public class c2_TransformingSequence extends TransformingSequenceBase {
      *  Use first Flux value as initial value.
      */
     @Test
-    public void sum_each_successive() {
+    void sum_each_successive() {
         Flux<Integer> sumEach = numerical_service()
-                //todo: do your changes here
-                ;
+            .scan(Integer::sum);
 
         StepVerifier.create(sumEach)
-                    .expectNext(1, 3, 6, 10, 15, 21, 28, 36, 45, 55)
-                    .verifyComplete();
+            .expectNext(1, 3, 6, 10, 15, 21, 28, 36, 45, 55)
+            .verifyComplete();
     }
 
     /**
      * A developer who wrote `numerical_service()` forgot that sequence should start with zero, so you must prepend zero
      * to result sequence.
-     *
-     * Do not alter `numerical_service` implementation!
-     * Use only one operator.
+     * <p>
+     * Do not alter `numerical_service` implementation! Use only one operator.
      */
     @Test
     public void sequence_starts_with_zero() {
         Flux<Integer> result = numerical_service()
-                //todo: change this line only
-                ;
+            .startWith(0);
 
         StepVerifier.create(result)
-                    .expectNext(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                    .verifyComplete();
+            .expectNext(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+            .verifyComplete();
     }
 }
